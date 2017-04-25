@@ -31,6 +31,10 @@ public struct SKPhotoBrowserOptions {
     public static var enableSingleTapDismiss: Bool = false
     
     public static var backgroundColor: UIColor = .black
+	public static var imagePadding: CGFloat = 20
+	
+	public static var titleFont: UIFont = UIFont.systemFont(ofSize: 14)
+	public static var titleFontColor: UIColor = UIColor.white
 }
 
 public struct SKCaptionOptions {
@@ -44,4 +48,6 @@ public struct SKCaptionOptions {
 public struct SKToolbarOptions {
     public static var textColor: UIColor = .white
     public static var font: UIFont = .systemFont(ofSize: 17.0)
+	public static var backArrowImageName: String = "btn_common_back_wh"
+	public static var forwardArrowImageName: String = "btn_common_forward_wh"
 }

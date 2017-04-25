@@ -17,7 +17,7 @@ import UIKit
 class SKAnimator: NSObject, SKPhotoBrowserAnimatorDelegate {
     var resizableImageView: UIImageView?
     
-    var senderOriginImage: UIImage!
+    var senderOriginImage: UIImage?
     var senderViewOriginalFrame: CGRect = .zero
     var senderViewForAnimation: UIView?
     
@@ -51,7 +51,7 @@ class SKAnimator: NSObject, SKPhotoBrowserAnimatorDelegate {
         
         let photo = browser.photoAtIndex(browser.currentPageIndex)
         let imageFromView = (senderOriginImage ?? browser.getImageFromView(sender)).rotateImageByOrientation()
-        let imageRatio = imageFromView.size.width / imageFromView.size.height
+		let imageRatio = (photo.finalSize != CGSize.zero) ? photo.finalSize.width / photo.finalSize.height : imageFromView.size.width / imageFromView.size.height
         
         senderViewOriginalFrame = calcOriginFrame(sender)
         finalImageViewFrame = calcFinalFrame(imageRatio)
@@ -125,17 +125,29 @@ private extension SKAnimator {
     }
     
     func calcFinalFrame(_ imageRatio: CGFloat) -> CGRect {
+		let rect: CGRect
+		
+		let compressedByWidth = { () -> CGRect in
+			let width = SKMesurement.screenWidth - (SKPhotoBrowserOptions.imagePadding * 2)
+			let height = width / imageRatio
+			let yOffset = abs((SKMesurement.screenHeight - height) / 2)
+			return CGRect(x: SKPhotoBrowserOptions.imagePadding, y: yOffset, width: width, height: height)
+		}
+		
         if SKMesurement.screenRatio < imageRatio {
-            let width = SKMesurement.screenWidth
-            let height = width / imageRatio
-            let yOffset = (SKMesurement.screenHeight - height) / 2
-            return CGRect(x: 0, y: yOffset, width: width, height: height)
-        } else {
-            let height = SKMesurement.screenHeight
-            let width = height * imageRatio
-            let xOffset = (SKMesurement.screenWidth - width) / 2
-            return CGRect(x: xOffset, y: 0, width: width, height: height)
+			rect = compressedByWidth()
         }
+		else {
+            let height = SKMesurement.screenHeight - (SKPhotoBrowserOptions.imagePadding * 2)
+            let width = height * imageRatio
+			if width > SKMesurement.screenWidth - (SKPhotoBrowserOptions.imagePadding * 2) {
+				rect = compressedByWidth()
+			} else {
+				let xOffset = abs((SKMesurement.screenWidth - width) / 2)
+				rect = CGRect(x: xOffset, y: SKPhotoBrowserOptions.imagePadding, width: width, height: height)
+			}
+        }
+		return rect
     }
 }
 
@@ -143,7 +155,7 @@ private extension SKAnimator {
     func presentAnimation(_ browser: SKPhotoBrowser, completion: ((Void) -> Void)? = nil) {
         browser.view.isHidden = true
         browser.view.alpha = 0.0
-        
+		
         UIView.animate(
             withDuration: animationDuration,
             delay: 0,
@@ -152,8 +164,7 @@ private extension SKAnimator {
             options:UIViewAnimationOptions(),
             animations: {
                 browser.showButtons()
-                browser.backgroundView.alpha = 1.0
-                
+                browser.backgroundView.alpha = 1.0                
                 self.resizableImageView?.frame = self.finalImageViewFrame
             },
             completion: { (Bool) -> Void in
@@ -166,6 +177,11 @@ private extension SKAnimator {
     }
     
     func dismissAnimation(_ browser: SKPhotoBrowser, completion: ((Void) -> Void)? = nil) {
+		self.resizableImageView?.alpha = 1
+		UIView.animate(withDuration: animationDuration/2, delay: (animationDuration/2), options: UIViewAnimationOptions(), animations: {
+			self.resizableImageView?.alpha = 0
+		}, completion: nil)
+		
         UIView.animate(
             withDuration: animationDuration,
             delay:0,

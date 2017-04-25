@@ -23,7 +23,7 @@ class SKButton: UIButton {
     }
     var size: CGSize = CGSize(width: 44, height: 44)
     var margin: CGFloat = 5
-    var buttonTopOffset: CGFloat { return 5 }
+    var buttonTopOffset: CGFloat { return 20 }
     
     func setup(_ imageName: String) {
         backgroundColor = .clear
@@ -37,10 +37,10 @@ class SKButton: UIButton {
     }
   
     func setFrameSize(_ size: CGSize) {
-        let newRect = CGRect(x: margin, y: buttonTopOffset, width: size.width, height: size.height)
+        let newRect = CGRect(x: frame.origin.x, y: frame.origin.y, width: size.width, height: size.height)
         frame = newRect
         showFrame = newRect
-        hideFrame = CGRect(x: margin, y: -20, width: size.width, height: size.height)
+        hideFrame = CGRect(x: frame.origin.x, y: -20, width: size.width, height: size.height)
     }
 }
 
@@ -53,9 +53,23 @@ class SKCloseButton: SKButton {
     override init(frame: CGRect) {
         super.init(frame: frame)
         setup(imageName)
-        showFrame = CGRect(x: margin, y: buttonTopOffset, width: size.width, height: size.height)
-        hideFrame = CGRect(x: margin, y: -20, width: size.width, height: size.height)
     }
+	
+	override var showFrame: CGRect! {
+		get {
+			let screenWidth = window == nil ? SKMesurement.screenWidth : window!.bounds.size.width
+			return CGRect(x: screenWidth - size.width - 8, y: buttonTopOffset, width: size.width, height: size.height)
+		}
+		set { }
+	}
+	
+	override var hideFrame: CGRect! {
+		get {
+			let screenWidth = window == nil ? SKMesurement.screenWidth : window!.bounds.size.width
+			return CGRect(x: screenWidth - size.width - 8, y: -20, width: size.width, height: size.height)
+		}
+		set { }
+	}
 }
 
 class SKDeleteButton: SKButton {

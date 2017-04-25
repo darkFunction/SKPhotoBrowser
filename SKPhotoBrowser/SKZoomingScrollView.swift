@@ -21,7 +21,7 @@ open class SKZoomingScrollView: UIScrollView {
             }
         }
     }
-    
+	
     fileprivate(set) var photoImageView: SKDetectingImageView!
     fileprivate weak var photoBrowser: SKPhotoBrowser?
     fileprivate var tapView: SKDetectingView!
@@ -117,8 +117,8 @@ open class SKZoomingScrollView: UIScrollView {
         let boundsSize = bounds.size
         let imageSize = photoImageView.frame.size
         
-        let xScale = boundsSize.width / imageSize.width
-        let yScale = boundsSize.height / imageSize.height
+        let xScale = abs((boundsSize.width - SKPhotoBrowserOptions.imagePadding * 2) / imageSize.width)
+        let yScale = abs((boundsSize.height - SKPhotoBrowserOptions.imagePadding * 2) / imageSize.height)
         let minScale: CGFloat = min(xScale, yScale)
         var maxScale: CGFloat = 1.0
         
@@ -141,8 +141,8 @@ open class SKZoomingScrollView: UIScrollView {
         }
     
         maximumZoomScale = maxScale
-        minimumZoomScale = minScale
-        zoomScale = minScale
+        minimumZoomScale = minScale// * (1.0 - ((SKPhotoBrowserOptions.imagePadding * 2) / boundsSize.width))
+        zoomScale = minimumZoomScale
         
         // on high resolution screens we have double the pixel density, so we will be seeing every pixel if we limit the
         // maximum zoom scale to 0.5

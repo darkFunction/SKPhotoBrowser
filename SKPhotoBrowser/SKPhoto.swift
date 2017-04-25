@@ -15,6 +15,7 @@ import UIKit
     var contentMode: UIViewContentMode { get set }
     func loadUnderlyingImageAndNotify()
     func checkCache()
+	var finalSize: CGSize { get set }
 }
 
 // MARK: - SKPhoto
@@ -26,6 +27,7 @@ open class SKPhoto: NSObject, SKPhotoProtocol {
     open var shouldCachePhotoURLImage: Bool = false
     open var caption: String!
     open var index: Int = 0
+	open var finalSize = CGSize.zero
 
     override init() {
         super.init()

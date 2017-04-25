@@ -71,8 +71,11 @@ private extension SKToolbar {
         guard let browser = browser else { return }
         
         let flexSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+		let fixedSpaceEdge = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: self, action: nil)
+		fixedSpaceEdge.width = -12
         var items = [UIBarButtonItem]()
-        items.append(flexSpace)
+		items.append(fixedSpaceEdge)
+
         if browser.numberOfPhotos > 1 && SKPhotoBrowserOptions.displayBackAndForwardButton {
             items.append(toolPreviousButton)
         }
@@ -86,10 +89,11 @@ private extension SKToolbar {
         if browser.numberOfPhotos > 1 && SKPhotoBrowserOptions.displayBackAndForwardButton {
             items.append(toolNextButton)
         }
-        items.append(flexSpace)
         if SKPhotoBrowserOptions.displayAction {
             items.append(toolActionButton)
         }
+		items.append(fixedSpaceEdge)
+
         setItems(items, animated: false)
     }
     
@@ -124,23 +128,24 @@ private extension SKToolbar {
 
 
 class SKToolbarButton: UIButton {
-    let insets: UIEdgeInsets = UIEdgeInsets(top: 13.25, left: 17.25, bottom: 13.25, right: 17.25)
-    
+	
     func setup(_ imageName: String) {
         backgroundColor = .clear
-        imageEdgeInsets = insets
+        imageView?.contentMode = .center
         translatesAutoresizingMaskIntoConstraints = true
         autoresizingMask = [.flexibleBottomMargin, .flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin]
         contentMode = .center
         
-        let image = UIImage(named: "SKPhotoBrowser.bundle/images/\(imageName)",
-                            in: bundle, compatibleWith: nil) ?? UIImage()
-        setImage(image, for: UIControlState())
+		if let packagedImage = UIImage(named: "SKPhotoBrowser.bundle/images/\(imageName)", in: bundle, compatibleWith: nil) {
+			setImage(packagedImage, for: UIControlState())
+		} else {
+			setImage(UIImage(named: imageName) ?? UIImage(), for: UIControlState())
+		}
     }
 }
 
 class SKPreviousButton: SKToolbarButton {
-    let imageName = "btn_common_back_wh"
+    let imageName = SKToolbarOptions.backArrowImageName
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
@@ -152,7 +157,7 @@ class SKPreviousButton: SKToolbarButton {
 }
 
 class SKNextButton: SKToolbarButton {
-    let imageName = "btn_common_forward_wh"
+    let imageName = SKToolbarOptions.forwardArrowImageName
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }

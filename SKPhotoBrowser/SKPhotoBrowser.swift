@@ -18,6 +18,8 @@ open class SKPhotoBrowser: UIViewController {
     fileprivate var closeButton: SKCloseButton!
     fileprivate var deleteButton: SKDeleteButton!
     fileprivate var toolbar: SKToolbar!
+	fileprivate var titleLabel: UILabel!
+	fileprivate var titleSeparator: UIView!
     
     // actions
     fileprivate var activityViewController: UIActivityViewController!
@@ -74,7 +76,7 @@ open class SKPhotoBrowser: UIViewController {
         }
     }
     
-    public convenience init(originImage: UIImage, photos: [SKPhotoProtocol], animatedFromView: UIView) {
+    public convenience init(originImage: UIImage?, photos: [SKPhotoProtocol], animatedFromView: UIView) {
         self.init(nibName: nil, bundle: nil)
         animator.senderOriginImage = originImage
         animator.senderViewForAnimation = animatedFromView
@@ -117,6 +119,7 @@ open class SKPhotoBrowser: UIViewController {
         configureCloseButton()
         configureDeleteButton()
         configureToolbar()
+		configureTitle()
         
         animator.willPresent(self)
     }
@@ -390,7 +393,7 @@ internal extension SKPhotoBrowser {
             deleteButton.alpha = 1
             deleteButton.frame = deleteButton.showFrame
         }
-    }
+	}
     
     func pageDisplayedAtIndex(_ index: Int) -> SKZoomingScrollView? {
         return pagingScrollView.pageDisplayedAtIndex(index)
@@ -414,7 +417,7 @@ internal extension SKPhotoBrowser {
         if UIInterfaceOrientationIsLandscape(currentOrientation) {
             height = 32
         }
-        return CGRect(x: 0, y: view.bounds.size.height - height, width: view.bounds.size.width, height: height)
+        return CGRect(x: 0, y: view.bounds.size.height - height - 49, width: view.bounds.size.width, height: height)
     }
     
     func frameForToolbarHideAtOrientation() -> CGRect {
@@ -571,6 +574,8 @@ private extension SKPhotoBrowser {
         closeButton = SKCloseButton(frame: .zero)
         closeButton.addTarget(self, action: #selector(closeButtonPressed(_:)), for: .touchUpInside)
         closeButton.isHidden = !SKPhotoBrowserOptions.displayCloseButton
+        closeButton.imageView?.contentMode = .center
+		closeButton.autoresizingMask = [.flexibleLeftMargin, .flexibleBottomMargin]
         view.addSubview(closeButton)
     }
     
@@ -585,7 +590,26 @@ private extension SKPhotoBrowser {
         toolbar = SKToolbar(frame: frameForToolbarAtOrientation(), browser: self)
         view.addSubview(toolbar)
     }
-    
+	
+	func configureTitle() {
+		titleLabel = UILabel(frame: CGRect.zero)
+		titleLabel.text = title
+		titleLabel.autoresizingMask = [.flexibleRightMargin, .flexibleLeftMargin]
+		titleLabel.font = SKPhotoBrowserOptions.titleFont
+		titleLabel.textColor = SKPhotoBrowserOptions.titleFontColor
+		titleLabel.sizeToFit()
+		let width = titleLabel.frame.width
+		var height: CGFloat = navigationController?.navigationBar.frame.size.height ?? 44
+		titleLabel.frame = CGRect(x: (view.bounds.size.width/2) - (width/2), y: 20, width: width, height: 44)
+		view.addSubview(titleLabel)
+		
+		let separatorWidth = view.bounds.width
+		titleSeparator = UIView(frame: CGRect(x: (view.bounds.size.width / 2) - (separatorWidth / 2), y: titleLabel.frame.maxY, width: separatorWidth, height: 1))
+		titleSeparator.backgroundColor = UIColor.white.withAlphaComponent(0.2)
+		titleSeparator.autoresizingMask = [.flexibleWidth]
+		view.addSubview(titleSeparator)
+	}
+	
     func setControlsHidden(_ hidden: Bool, animated: Bool, permanent: Bool) {
         cancelControlHiding()
         
@@ -605,6 +629,18 @@ private extension SKPhotoBrowser {
                     self.deleteButton.alpha = alpha
                     self.deleteButton.frame = hidden ? self.deleteButton.hideFrame : self.deleteButton.showFrame
                 }
+				
+				// Show title
+				self.titleLabel.alpha = alpha
+				var titleFrame = self.titleLabel.frame
+				titleFrame.origin.y = hidden ? -20 : 20
+				self.titleLabel.frame = titleFrame
+				
+				self.titleSeparator.alpha = alpha
+				var titleSeparatorFrame = self.titleSeparator.frame
+				titleSeparatorFrame.origin.y = titleFrame.maxY
+				self.titleSeparator.frame = titleSeparatorFrame
+				
                 captionViews.forEach { $0.alpha = alpha }
             },
             completion: nil)
