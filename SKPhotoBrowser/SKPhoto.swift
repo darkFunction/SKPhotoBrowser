@@ -11,6 +11,8 @@ import UIKit
 @objc public protocol SKPhotoProtocol: NSObjectProtocol {
     var underlyingImage: UIImage! { get }
     var caption: String! { get }
+	var linkTitle: String? { get }
+	var linkAction: (()->())? { get set }
     var index: Int { get set}
     var contentMode: UIViewContentMode { get set }
     func loadUnderlyingImageAndNotify()
@@ -28,7 +30,9 @@ open class SKPhoto: NSObject, SKPhotoProtocol {
     open var caption: String!
     open var index: Int = 0
 	open var finalSize = CGSize.zero
-
+	open var linkTitle: String?
+	open var linkAction: (()->())?
+	
     override init() {
         super.init()
     }

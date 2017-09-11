@@ -35,6 +35,8 @@ public struct SKPhotoBrowserOptions {
 	
 	public static var titleFont: UIFont = UIFont.systemFont(ofSize: 14)
 	public static var titleFontColor: UIColor = UIColor.white
+	
+	public static var indicatorClass: UIActivityIndicatorView.Type = SKIndicatorView.self
 }
 
 public struct SKCaptionOptions {

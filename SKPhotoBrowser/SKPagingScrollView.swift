@@ -159,10 +159,19 @@ class SKPagingScrollView: UIScrollView {
     
     func frameForCaptionView(_ captionView: SKCaptionView, index: Int) -> CGRect {
         let pageFrame = frameForPageAtIndex(index)
+		
+		//let photoSize = pageDisplayedAtIndex(index)!.photoImageView.frame.size
+		
         let captionSize = captionView.sizeThatFits(CGSize(width: pageFrame.size.width, height: 0))
         let navHeight = browser?.navigationController?.navigationBar.frame.size.height ?? 44
-        return CGRect(x: pageFrame.origin.x, y: pageFrame.size.height - captionSize.height - navHeight,
-                      width: pageFrame.size.width, height: captionSize.height)
+		let toolbarY = browser?.frameForToolbarAtOrientation().origin.y ?? pageFrame.size.height
+		
+        return CGRect(
+			x: pageFrame.origin.x,
+			y: toolbarY - captionSize.height,
+			width: pageFrame.size.width,
+			height: captionSize.height
+		)
     }
     
     func pageDisplayedAtIndex(_ index: Int) -> SKZoomingScrollView? {
@@ -203,7 +212,7 @@ private extension SKPagingScrollView {
     }
     
     func createCaptionView(_ index: Int) -> SKCaptionView? {
-        guard let photo = browser?.photoAtIndex(index), photo.caption != nil else {
+        guard let photo = browser?.photoAtIndex(index), (photo.caption != nil || photo.linkTitle != nil) else {
             return nil
         }
         return SKCaptionView(photo: photo)

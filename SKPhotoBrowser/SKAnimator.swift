@@ -96,19 +96,21 @@ class SKAnimator: NSObject, SKPhotoBrowserAnimatorDelegate {
             y: scrollFrame.origin.y + contentOffset.y + offsetY,
             width: scrollFrame.width,
             height: scrollFrame.height)
-        
-//        resizableImageView.image = scrollView.photo?.underlyingImage?.rotateImageByOrientation()
-        resizableImageView!.image = image.rotateImageByOrientation()
-        resizableImageView!.frame = frame
-        resizableImageView!.alpha = 1.0
-        resizableImageView!.clipsToBounds = true
-        resizableImageView!.contentMode = photo.contentMode
-        if let view = senderViewForAnimation , view.layer.cornerRadius != 0 {
-            let duration = (animationDuration * Double(animationDamping))
-            resizableImageView!.layer.masksToBounds = true
-            resizableImageView!.addCornerRadiusAnimation(0, to: view.layer.cornerRadius, duration: duration)
-        }
-        
+		
+		if let resizableImageView = resizableImageView {
+	//        resizableImageView.image = scrollView.photo?.underlyingImage?.rotateImageByOrientation()
+			resizableImageView.image = image.rotateImageByOrientation()
+			resizableImageView.frame = frame
+			resizableImageView.alpha = 1.0
+			resizableImageView.clipsToBounds = true
+			resizableImageView.contentMode = photo.contentMode
+			if let view = senderViewForAnimation , view.layer.cornerRadius != 0 {
+				let duration = (animationDuration * Double(animationDamping))
+				resizableImageView.layer.masksToBounds = true
+				resizableImageView.addCornerRadiusAnimation(0, to: view.layer.cornerRadius, duration: duration)
+			}
+		}
+		
         dismissAnimation(browser)
     }
 }
@@ -134,18 +136,21 @@ private extension SKAnimator {
 			return CGRect(x: SKPhotoBrowserOptions.imagePadding, y: yOffset, width: width, height: height)
 		}
 		
-        if SKMesurement.screenRatio < imageRatio {
-			rect = compressedByWidth()
-        }
-		else {
-            let height = SKMesurement.screenHeight - (SKPhotoBrowserOptions.imagePadding * 2)
-            let width = height * imageRatio
+		let compressedByHeight = { () -> CGRect in
+			let height = SKMesurement.screenHeight - (SKPhotoBrowserOptions.imagePadding * 2)
+			let width = height * imageRatio
 			if width > SKMesurement.screenWidth - (SKPhotoBrowserOptions.imagePadding * 2) {
-				rect = compressedByWidth()
+				return compressedByWidth()
 			} else {
 				let xOffset = abs((SKMesurement.screenWidth - width) / 2)
-				rect = CGRect(x: xOffset, y: SKPhotoBrowserOptions.imagePadding, width: width, height: height)
+				return CGRect(x: xOffset, y: SKPhotoBrowserOptions.imagePadding, width: width, height: height)
 			}
+		}
+		
+        if SKMesurement.screenRatio < imageRatio {
+			rect = compressedByWidth()
+        } else {
+			rect = compressedByHeight()
         }
 		return rect
     }

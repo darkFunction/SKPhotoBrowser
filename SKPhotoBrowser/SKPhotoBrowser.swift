@@ -179,6 +179,8 @@ open class SKPhotoBrowser: UIViewController {
             } else {
                 page.displayImageFailure()
             }
+
+			self.view.setNeedsLayout()
         })
     }
     
@@ -346,7 +348,7 @@ public extension SKPhotoBrowser {
         }
         
         var activityItems: [AnyObject] = [underlyingImage]
-        if photo.caption != nil && includeCaption {
+        if (photo.caption != nil || photo.linkTitle != nil) && includeCaption {
             if let shareExtraCaption = SKPhotoBrowserOptions.shareExtraCaption {
                 let caption = photo.caption + shareExtraCaption
                 activityItems.append(caption as AnyObject)

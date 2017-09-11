@@ -25,7 +25,7 @@ open class SKZoomingScrollView: UIScrollView {
     fileprivate(set) var photoImageView: SKDetectingImageView!
     fileprivate weak var photoBrowser: SKPhotoBrowser?
     fileprivate var tapView: SKDetectingView!
-    fileprivate var indicatorView: SKIndicatorView!
+    fileprivate var indicatorView: UIActivityIndicatorView!
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -63,7 +63,7 @@ open class SKZoomingScrollView: UIScrollView {
         addSubview(photoImageView)
         
         // indicator
-        indicatorView = SKIndicatorView(frame: frame)
+        indicatorView = SKPhotoBrowserOptions.indicatorClass.init(frame: frame)
         addSubview(indicatorView)
         
         // self
@@ -94,7 +94,11 @@ open class SKZoomingScrollView: UIScrollView {
         }
         // vertical
         if frameToCenter.size.height < boundsSize.height {
-            frameToCenter.origin.y = floor((boundsSize.height - frameToCenter.size.height) / 2)
+			var bottomSpace: CGFloat = 0
+			if let captionView = captionView {
+				bottomSpace = captionView.bounds.size.height
+			}
+            frameToCenter.origin.y = floor((boundsSize.height - frameToCenter.size.height - bottomSpace) / 2)
         } else {
             frameToCenter.origin.y = 0
         }
@@ -114,9 +118,19 @@ open class SKZoomingScrollView: UIScrollView {
             return
         }
         
-        let boundsSize = bounds.size
+        var boundsSize = bounds.size
         let imageSize = photoImageView.frame.size
-        
+		
+		if captionView != nil && UIDevice.current.userInterfaceIdiom != .pad {
+			var toolBarSpace: CGFloat = 0
+			if let photoBrowser = photoBrowser {
+				let toolBarY = photoBrowser.frameForToolbarAtOrientation().origin.y
+				toolBarSpace = (boundsSize.height - toolBarY)
+			}
+			boundsSize.height -= (toolBarSpace * 2) 
+			boundsSize.height -= captionView.bounds.size.height
+		}
+		
         let xScale = abs((boundsSize.width - SKPhotoBrowserOptions.imagePadding * 2) / imageSize.width)
         let yScale = abs((boundsSize.height - SKPhotoBrowserOptions.imagePadding * 2) / imageSize.height)
         let minScale: CGFloat = min(xScale, yScale)
@@ -141,7 +155,7 @@ open class SKZoomingScrollView: UIScrollView {
         }
     
         maximumZoomScale = maxScale
-        minimumZoomScale = minScale// * (1.0 - ((SKPhotoBrowserOptions.imagePadding * 2) / boundsSize.width))
+        minimumZoomScale = minScale
         zoomScale = minimumZoomScale
         
         // on high resolution screens we have double the pixel density, so we will be seeing every pixel if we limit the
