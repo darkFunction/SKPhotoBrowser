@@ -135,13 +135,18 @@ open class SKPhotoBrowser: UIViewController {
             i = i + 1
         }
     }
-    
+	
+	open override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+		super.viewWillTransition(to: size, with: coordinator)
+		coordinator.animate(alongsideTransition: nil) { (context: UIViewControllerTransitionCoordinatorContext) in
+			self.pagingScrollView.updateFrame(self.view.bounds, currentPageIndex: self.currentPageIndex)
+		}
+	}
+	
     override open func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
         isPerformingLayout = true
-        
-        pagingScrollView.updateFrame(view.bounds, currentPageIndex: currentPageIndex)
-        
+		
         toolbar.frame = frameForToolbarAtOrientation()
         
         // where did start
