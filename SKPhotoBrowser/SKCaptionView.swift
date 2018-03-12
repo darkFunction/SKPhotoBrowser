@@ -27,11 +27,13 @@ fileprivate func > <T : Comparable>(lhs: T?, rhs: T?) -> Bool {
   }
 }
 
-
 open class SKCaptionView: UIView {
     fileprivate var photo: SKPhotoProtocol?
     fileprivate var photoLabel: UILabel!
-    fileprivate var photoLabelPadding: CGFloat = 10
+	fileprivate var linkButton: UIButton!
+	
+	fileprivate let photoLabelPadding: CGFloat = 20
+	fileprivate let linkButtonHeight: CGFloat = 20
     
     required public init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
@@ -48,22 +50,24 @@ open class SKCaptionView: UIView {
         setup()
     }
     
-    open override func sizeThatFits(_ size: CGSize) -> CGSize {
-        guard let text = photoLabel.text else {
-            return CGSize.zero
-        }
-        guard photoLabel.text?.characters.count > 0 else {
-            return CGSize.zero
-        }
-        
+	open override func sizeThatFits(_ size: CGSize) -> CGSize {
+		
         let font: UIFont = photoLabel.font
         let width: CGFloat = size.width - photoLabelPadding * 2
         let height: CGFloat = photoLabel.font.lineHeight * CGFloat(photoLabel.numberOfLines)
-        
-        let attributedText = NSAttributedString(string: text, attributes: [NSFontAttributeName: font])
-        let textSize = attributedText.boundingRect(with: CGSize(width: width, height: height), options: .usesLineFragmentOrigin, context: nil).size
-        
-        return CGSize(width: textSize.width, height: textSize.height + photoLabelPadding * 2)
+		
+		let textSize: CGSize
+		if let text = photoLabel.text {
+			let attributedText = NSAttributedString(string: text, attributes: [NSAttributedStringKey.font: font])
+			textSize = attributedText.boundingRect(with: CGSize(width: width, height: height), options: .usesLineFragmentOrigin, context: nil).size
+		} else {
+			textSize = CGSize.zero
+		}
+		
+		let linkExtraHeight = linkButton.isHidden ? 0 : (linkButtonHeight + photoLabelPadding * 2)
+		let captionExtraHeight = photoLabel.isHidden ? 0 : textSize.height + (photoLabelPadding * 2)
+		
+        return CGSize(width: textSize.width, height: captionExtraHeight + linkExtraHeight)
     }
 }
 
@@ -71,13 +75,18 @@ private extension SKCaptionView {
     func setup() {
         isOpaque = false
         autoresizingMask = [.flexibleWidth, .flexibleTopMargin, .flexibleRightMargin, .flexibleLeftMargin]
-        
-        // setup photoLabel
+		
         setupPhotoLabel()
+		setupLinkButton()
     }
     
     func setupPhotoLabel() {
-        photoLabel = UILabel(frame: CGRect(x: photoLabelPadding, y: 0, width: bounds.size.width - (photoLabelPadding * 2), height: bounds.size.height))
+		photoLabel = UILabel(frame: CGRect(
+			x: photoLabelPadding,
+			y: 0,
+			width: bounds.size.width - (photoLabelPadding * 2),
+			height: bounds.size.height - (photo?.linkTitle == nil ? 0 : (linkButtonHeight + photoLabelPadding))
+		))
         photoLabel.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         photoLabel.isOpaque = false
         photoLabel.backgroundColor = .clear
@@ -90,6 +99,40 @@ private extension SKCaptionView {
         photoLabel.shadowOffset = CGSize(width: 0.0, height: 1.0)
         photoLabel.text = photo?.caption
         addSubview(photoLabel)
+		
+		photoLabel.isHidden = photo?.caption == nil
     }
+	
+	func setupLinkButton() {
+		linkButton = UIButton(frame: CGRect(
+			x: photoLabelPadding,
+			y: bounds.size.height - linkButtonHeight - photoLabelPadding,
+			width: bounds.size.width - (photoLabelPadding * 2),
+			height: linkButtonHeight
+		))
+		linkButton.autoresizingMask = [.flexibleLeftMargin, .flexibleRightMargin, .flexibleTopMargin]
+		linkButton.backgroundColor = SKCaptionOptions.textColor
+		linkButton.titleLabel?.font = SKCaptionOptions.font
+		linkButton.layer.cornerRadius = linkButtonHeight/2
+		linkButton.setTitle(photo?.linkTitle, for: .normal)
+		linkButton.setTitleColor(.black, for: .normal)
+		
+		linkButton.sizeToFit()
+		let padding: CGFloat = 10
+		linkButton.center = CGPoint(x: center.x - padding, y: linkButton.center.y)
+		var r = linkButton.frame
+		r.size.height = linkButtonHeight
+		r.size.width += padding * 2
+		linkButton.frame = r;
+		addSubview(linkButton)
+		
+		linkButton.isHidden = photo?.linkTitle == nil
+		
+		linkButton.addTarget(self, action: #selector(linkButtonTapped), for: .touchUpInside)
+	}
+	
+	@objc func linkButtonTapped() {
+		photo?.linkAction?()
+	}
 }
 
