@@ -58,7 +58,7 @@ open class SKCaptionView: UIView {
 		
 		let textSize: CGSize
 		if let text = photoLabel.text {
-			let attributedText = NSAttributedString(string: text, attributes: [NSFontAttributeName: font])
+			let attributedText = NSAttributedString(string: text, attributes: [NSAttributedStringKey.font: font])
 			textSize = attributedText.boundingRect(with: CGSize(width: width, height: height), options: .usesLineFragmentOrigin, context: nil).size
 		} else {
 			textSize = CGSize.zero

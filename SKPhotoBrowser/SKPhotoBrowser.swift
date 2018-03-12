@@ -11,6 +11,7 @@ import UIKit
 public let SKPHOTO_LOADING_DID_END_NOTIFICATION = "photoLoadingDidEndNotification"
 
 // MARK: - SKPhotoBrowser
+@objcMembers
 open class SKPhotoBrowser: UIViewController {
     
     let pageIndexTagOffset: Int = 1000
@@ -222,7 +223,7 @@ open class SKPhotoBrowser: UIViewController {
         NSObject.cancelPreviousPerformRequests(withTarget: self)
     }
     
-    open func dismissPhotoBrowser(animated: Bool, completion: ((Void) -> Void)? = nil) {
+    open func dismissPhotoBrowser(animated: Bool, completion: (() -> Void)? = nil) {
         prepareForClosePhotoBrowser()
 
         if !animated {
