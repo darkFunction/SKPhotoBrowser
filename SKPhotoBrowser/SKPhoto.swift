@@ -14,7 +14,7 @@ import UIKit
 	var linkTitle: String? { get }
 	var linkAction: (()->())? { get set }
     var index: Int { get set}
-    var contentMode: UIViewContentMode { get set }
+    var contentMode: UIView.ContentMode { get set }
     func loadUnderlyingImageAndNotify()
     func checkCache()
 	var finalSize: CGSize { get set }
@@ -25,7 +25,7 @@ open class SKPhoto: NSObject, SKPhotoProtocol {
     
     open var underlyingImage: UIImage!
     open var photoURL: String!
-    open var contentMode: UIViewContentMode = .scaleAspectFill
+    open var contentMode: UIView.ContentMode = .scaleAspectFill
     open var shouldCachePhotoURLImage: Bool = false
     open var caption: String!
     open var index: Int = 0

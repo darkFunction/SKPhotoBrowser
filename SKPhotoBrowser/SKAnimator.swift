@@ -166,7 +166,7 @@ private extension SKAnimator {
             delay: 0,
             usingSpringWithDamping:animationDamping,
             initialSpringVelocity:0,
-            options:UIViewAnimationOptions(),
+            options:UIView.AnimationOptions(),
             animations: {
                 browser.showButtons()
                 browser.backgroundView.alpha = 1.0                
@@ -183,7 +183,7 @@ private extension SKAnimator {
     
     func dismissAnimation(_ browser: SKPhotoBrowser, completion: ((Void) -> Void)? = nil) {
 		self.resizableImageView?.alpha = 1
-		UIView.animate(withDuration: animationDuration/2, delay: (animationDuration/2), options: UIViewAnimationOptions(), animations: {
+        UIView.animate(withDuration: animationDuration/2, delay: (animationDuration/2), options: UIView.AnimationOptions(), animations: {
 			self.resizableImageView?.alpha = 0
 		}, completion: nil)
 		
@@ -192,7 +192,7 @@ private extension SKAnimator {
             delay:0,
             usingSpringWithDamping:animationDamping,
             initialSpringVelocity:0,
-            options:UIViewAnimationOptions(),
+            options:UIView.AnimationOptions(),
             animations: {
                 browser.backgroundView.alpha = 0.0
                 

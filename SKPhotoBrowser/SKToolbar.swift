@@ -137,9 +137,9 @@ class SKToolbarButton: UIButton {
         contentMode = .center
         
 		if let packagedImage = UIImage(named: "SKPhotoBrowser.bundle/images/\(imageName)", in: bundle, compatibleWith: nil) {
-			setImage(packagedImage, for: UIControlState())
+            setImage(packagedImage, for: UIControl.State())
 		} else {
-			setImage(UIImage(named: imageName) ?? UIImage(), for: UIControlState())
+            setImage(UIImage(named: imageName) ?? UIImage(), for: UIControl.State())
 		}
     }
 }

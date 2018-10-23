@@ -249,7 +249,7 @@ public extension SKPhotoBrowser {
         if closeButton == nil {
             configureCloseButton()
         }
-        closeButton.setImage(image, for: UIControlState())
+    closeButton.setImage(image, for: UIControl.State())
     
         if let size = size {
             closeButton.setFrameSize(size)
@@ -260,7 +260,7 @@ public extension SKPhotoBrowser {
         if deleteButton == nil {
             configureDeleteButton()
         }
-        deleteButton.setImage(image, for: UIControlState())
+    deleteButton.setImage(image, for: UIControl.State())
     
         if let size = size {
             deleteButton.setFrameSize(size)
@@ -422,7 +422,7 @@ internal extension SKPhotoBrowser {
     func frameForToolbarAtOrientation() -> CGRect {
         let currentOrientation = UIApplication.shared.statusBarOrientation
         var height: CGFloat = navigationController?.navigationBar.frame.size.height ?? 44
-        if UIInterfaceOrientationIsLandscape(currentOrientation) {
+        if currentOrientation.isLandscape {
             height = 32
         }
         return CGRect(x: 0, y: view.bounds.size.height - height - 49, width: view.bounds.size.width, height: height)
@@ -431,7 +431,7 @@ internal extension SKPhotoBrowser {
     func frameForToolbarHideAtOrientation() -> CGRect {
         let currentOrientation = UIApplication.shared.statusBarOrientation
         var height: CGFloat = navigationController?.navigationBar.frame.size.height ?? 44
-        if UIInterfaceOrientationIsLandscape(currentOrientation) {
+        if currentOrientation.isLandscape {
             height = 32
         }
         return CGRect(x: 0, y: view.bounds.size.height + height, width: view.bounds.size.width, height: height)
@@ -500,7 +500,7 @@ internal extension SKPhotoBrowser {
                 
                 UIView.beginAnimations(nil, context: nil)
                 UIView.setAnimationDuration(animationDuration)
-                UIView.setAnimationCurve(UIViewAnimationCurve.easeIn)
+                UIView.setAnimationCurve(UIView.AnimationCurve.easeIn)
                 view.backgroundColor = SKPhotoBrowserOptions.backgroundColor
                 zoomingScrollView.center = CGPoint(x: finalX, y: finalY)
                 UIView.commitAnimations()
